@@ -27,25 +27,45 @@ module.exports = function(app) {
   ]
 
   booksRouter.get('/', function(req, res) {
+    
+    var data = [];
+    books.forEach(function(item){
+      data.push({
+        type:'books',
+        id: item.id.toString(),
+        attributes: {
+          title: item.title,
+          author: item.author,
+          description: item.description 
+        }
+      });
+    });
+    res.set('content-type', 'application/vnd.api_json');
     res.send({
-      'books': books
+      data: data
+      //'books': books
       //'books': []
     });
   });
 
   booksRouter.post('/', function(req, res) {
-    var newBook = req.body.book;
+    var newBook = req.body.data.attributes;
     var newId = books.length + 1;
-    newBook.id = newId;
-    books.push(newBook);  
-    
+
+    books.push({
+      title: newBook.title,
+      author: newBook.author,
+      description: newBook.description
+    });
+
+    res.set('content-type', 'application/vnd.api_json');
     res.send({
-      'books': {
-        id:req.params.id
+      data:{
+        type: 'books',
+        id: newId,
+        attributes: newBook
       }
     });
-    
-    //res.status(201).end();
   });
 
   booksRouter.get('/:id', function(req, res) {
