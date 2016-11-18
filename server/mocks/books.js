@@ -27,25 +27,45 @@ module.exports = function(app) {
   ]
 
   booksRouter.get('/', function(req, res) {
+    
+    var data = [];
+    books.forEach(function(item){
+      data.push({
+        type:'books',
+        id: item.id.toString(),
+        attributes: {
+          title: item.title,
+          author: item.author,
+          description: item.description 
+        }
+      });
+    });
+    res.set('content-type', 'application/vnd.api_json');
     res.send({
-      'books': books
+      data: data
+      //'books': books
       //'books': []
     });
   });
 
   booksRouter.post('/', function(req, res) {
-    var newBook = req.body.book;
+    var newBook = req.body.data.attributes;
     var newId = books.length + 1;
-    newBook.id = newId;
-    books.push(newBook);  
-    
+
+    books.push({
+      title: newBook.title,
+      author: newBook.author,
+      description: newBook.description
+    });
+
+    res.set('content-type', 'application/vnd.api_json');
     res.send({
-      'books': {
-        id:req.params.id
+      data:{
+        type: 'books',
+        id: newId,
+        attributes: newBook
       }
     });
-    
-    //res.status(201).end();
   });
 
   booksRouter.get('/:id', function(req, res) {
@@ -56,15 +76,44 @@ module.exports = function(app) {
     });
   });
 
-  booksRouter.put('/:id', function(req, res) {
-    res.send({
-      'books': {
-        id: req.params.id
+ booksRouter.patch('/:id', function(req, res) {
+    var bookAttrs = req.body.data.attributes;
+    var bookId = req.param('id');
+    books.forEach(function(item){
+      if (item.id === parseInt(bookId)){
+        item.title = bookAttrs.title;
+        item.author = bookAttrs.author;
+        item.description = bookAttrs.description;
       }
     });
+    res.send({
+      data:{
+        type: 'books',
+        id: bookId,
+        attributes: bookAttrs
+      }
+    })  
+    
+    
+    
   });
+ 
+  // booksRouter.put('/:id', function(req, res) {
+  //   res.send({
+  //     'books': {
+  //       id: req.params.id
+  //     }
+  //   });
+  // });
 
   booksRouter.delete('/:id', function(req, res) {
+    var bookId = req.param('id');
+    for (var i = 0; i < books.length; i++){
+      if (parseInt(bookId)=== books[i].id){
+        books.splice(i,1);
+        break;
+      }
+    }
     res.status(204).end();
   });
 
