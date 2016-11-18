@@ -11,11 +11,12 @@ export default Ember.Route.extend({
         return controller.setProperties(models);
     },
 
-    actions: {
+    actions: {    
         
-          createAction: function(book){
+        createAction: function(book){
             var _this = this;
-            this.store.createRecord('book',book).save().then(function(book){
+            //this.store.createRecord('book',book).save().then(function(book){
+            book.save().then(function(book){
                 _this.transitionTo('books.book',book);
             });
         },
