@@ -12,23 +12,7 @@ export default Ember.Route.extend({
     },
 
     actions: {    
-        
-        createAction: function(book){
-            var _this = this;
-            //this.store.createRecord('book',book).save().then(function(book){
-            book.save().then(function(book){
-                _this.transitionTo('books.book',book);
-            });
-        },
-
-        updateBook: function(book){
-            var _this = this;
-            book.save().then(function(book){
-                _this.transitionTo('books.book',book);
-
-            });
-        },
-
+      
         deleteBook: function(book){
             var _this = this;
             book.destroyRecord().then(function(){

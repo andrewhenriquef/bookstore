@@ -51,21 +51,41 @@ module.exports = function(app) {
   booksRouter.post('/', function(req, res) {
     var newBook = req.body.data.attributes;
     var newId = books.length + 1;
+    var bookTitles = [];
 
-    books.push({
-      title: newBook.title,
-      author: newBook.author,
-      description: newBook.description
+    books.forEach(function(item){
+      bookTitles.push(item.title);
     });
+    
+    if(bookTitles.indexOf(newBook.title) !== -1){
+      res.status(400).send({
+        errors: [
+          {
+            source: { pointer: '/data/attributes/title' },
+            detail: 'must be unique'
+          }
+        ]
+      });
+    } else {
 
-    res.set('content-type', 'application/vnd.api_json');
-    res.send({
-      data:{
-        type: 'books',
-        id: newId,
-        attributes: newBook
-      }
-    });
+      books.push({
+        title: newBook.title,
+        author: newBook.author,
+        description: newBook.description
+      });
+
+      res.set('content-type', 'application/vnd.api_json');
+      res.send({
+        data:{
+          type: 'books',
+          id: newId,
+          attributes: newBook
+        }
+      });
+
+    }
+
+    
   });
 
   booksRouter.get('/:id', function(req, res) {
@@ -79,21 +99,40 @@ module.exports = function(app) {
  booksRouter.patch('/:id', function(req, res) {
     var bookAttrs = req.body.data.attributes;
     var bookId = req.param('id');
+    var bookTitles = [];
     books.forEach(function(item){
-      if (item.id === parseInt(bookId)){
-        item.title = bookAttrs.title;
-        item.author = bookAttrs.author;
-        item.description = bookAttrs.description;
+    if (item.id !== parseInt(bookId)){
+        bookTitles.push(item.title);
       }
     });
-    res.send({
-      data:{
-        type: 'books',
-        id: bookId,
-        attributes: bookAttrs
-      }
-    })  
     
+    if(bookTitles.indexOf(bookAttrs.title) !== -1){
+      res.status(400).send({
+        errors: [
+          {
+            source: { pointer: '/data/attributes/title' },
+            detail: 'must be unique'
+          }
+        ]
+      });
+    } else {
+
+      books.forEach(function(item){
+        if (item.id === parseInt(bookId)){
+          item.title = bookAttrs.title;
+          item.author = bookAttrs.author;
+          item.description = bookAttrs.description;
+        }
+      });
+
+      res.send({
+        data:{
+          type: 'books',
+          id: bookId,
+          attributes: bookAttrs
+        }
+      })  
+    }
     
     
   });
