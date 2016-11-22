@@ -28,8 +28,8 @@ export default Ember.Component.extend({
         validate: function(){
             
             this.set('errors',DS.Errors.create());
-            this.validateTitle(this.get('book.Title'));
-            this.validateTitle(this.get('book.author'));
+            this.validateTitle(this.get('book.title'));
+            this.validateAuthor(this.get('book.author'));
             
             //if (this.get('book.title') === '' || this.get('book.title') === undefined){
             
